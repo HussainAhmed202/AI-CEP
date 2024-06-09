@@ -1,13 +1,13 @@
 import datetime
 
 import joblib
-
 import numpy as np
 import pandas as pd
 from flask import Flask, jsonify, render_template, request, url_for
 from flask_cors import cross_origin
 
 app = Flask(__name__, template_folder="template")
+
 
 def load_model():
     """Loads the model from the specified model path."""
@@ -18,24 +18,18 @@ def load_model():
     return model
 
 
-def preprocessor(input_lst:list) -> np.ndarray:
+def preprocessor(input_lst: list) -> np.ndarray:
     """Prepares the input user data for the model"""
-    
+
     SCALAR_PATH = "prep.pkl"
 
     # convert into 2D numpy array for scaling
-    input_lst = np.array(input_lst).reshape(1,-1)
-    
+    input_lst = np.array(input_lst).reshape(1, -1)
+
     scalar = joblib.load(open(SCALAR_PATH, "rb"))
     print("Scaler Loaded")
 
     return scalar.transform(input_lst)
-
-
-
-
-
-
 
 
 @app.route("/", methods=["GET"])
@@ -127,12 +121,8 @@ def predict():
         model = load_model()
         pred = model.predict(input_lst)
         if pred[0][0] > 0.5:
-             return render_template("rain.html")
+            return render_template("rain.html")
         else:
             return render_template("sunny.html")
-           
+
     return render_template("predictor.html")
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
